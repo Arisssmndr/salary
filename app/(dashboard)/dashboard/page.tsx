@@ -15,12 +15,16 @@ import {
   Users,
   UserCog,
   Settings,
-  LogOut
+  LogOut,
+  TrendingUp,
+  Clock,
+  CheckCircle2
 } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [activeMenu, setActiveMenu] = useState("Dashboard"); // State untuk judul dinamis
   const [isMasterOpen, setIsMasterOpen] = useState(true);
 
   useEffect(() => {
@@ -37,101 +41,75 @@ export default function DashboardPage() {
     router.push("/sign-in");
   };
 
-  return (
-    <div className="flex min-h-screen bg-[#141414] text-white font-sans">
-      {/* SIDEBAR - NETFLIX DARK RED CONCEPT */}
-      <aside className="w-72 bg-black border-r border-white/10 flex flex-col shadow-2xl">
-        
-        {/* Logo Section - Identik dengan Foto (Tosca) */}
-        <div className="p-8 flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#00c2cb] rounded-lg flex items-center justify-center shadow-lg transform hover:scale-105 transition">
-            <span className="text-white font-bold text-2xl italic">S</span>
-          </div>
-          <h1 className="text-white text-2xl font-bold tracking-tighter uppercase">
-            Salary<span className="text-[#00c2cb]">App</span>
-          </h1>
+  // Komponen Reusable untuk Card Info (Sesuai Foto)
+  const InfoCard = ({ title, value, icon: Icon, color, trend }: any) => (
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col gap-4 relative overflow-hidden group hover:shadow-md transition-all">
+      <div className="flex justify-between items-start">
+        <div className={`p-3 rounded-2xl ${color} bg-opacity-10 text-gray-700`}>
+          <Icon size={24} />
         </div>
+        {trend && (
+          <span className={`text-xs font-bold px-2 py-1 rounded-full ${trend.includes('+') ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            {trend}
+          </span>
+        )}
+      </div>
+      <div>
+        <h3 className="text-gray-400 text-sm font-medium">{title}</h3>
+        <p className="text-3xl font-bold text-gray-800 mt-1">{value}</p>
+      </div>
+    </div>
+  );
 
-        <nav className="flex-1 px-4 space-y-2">
-          {/* Dashboard Menu - Active State ala Netflix */}
-          <div className="flex items-center gap-4 px-4 py-3 rounded-md bg-[#E50914] cursor-pointer transition-all hover:brightness-110 text-white shadow-lg shadow-red-900/20">
-            <LayoutDashboard size={20} />
-            <span className="font-bold text-base uppercase tracking-wider">Dashboard</span>
+  return (
+    <div className="flex min-h-screen bg-[#F8FAFC] text-gray-800 font-sans">
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 overflow-y-auto">
+
+        <div className="p-10">
+          <div className="mb-10">
+            <h2 className="text-3xl font-bold text-gray-800">Welcome back, {user?.name || "Admin"}!</h2>
+            <p className="text-gray-400 mt-1 font-medium text-sm">Here&apos;s what&apos;s happening with your payroll system today.</p>
           </div>
 
-          {/* Master Menu - White Border identik dengan Foto */}
-          <div className="space-y-1">
-            <div 
-              onClick={() => setIsMasterOpen(!isMasterOpen)}
-              className="flex items-center justify-between px-4 py-3 rounded-md border-2 border-white cursor-pointer transition hover:bg-white/5 text-white"
-            >
-              <div className="flex items-center gap-4">
-                <Database size={20} />
-                <span className="font-bold text-base uppercase tracking-wider">Master</span>
-              </div>
-              {isMasterOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-            </div>
+          {/* Stats Grid (Identik Foto) */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <InfoCard title="Total Karyawan" value="124" icon={Users} color="bg-blue-500" trend="+12%" />
+            <InfoCard title="Divisi" value="8" icon={Building2} color="bg-purple-500" trend="Stable" />
+            <InfoCard title="Payroll Bulan Ini" value="Rp 450M" icon={Banknote} color="bg-green-500" trend="+5%" />
+            <InfoCard title="Pending Approval" value="12" icon={Clock} color="bg-orange-500" trend="-2" />
+          </div>
 
-            {/* Submenu Master */}
-            {isMasterOpen && (
-              <div className="ml-6 mt-2 space-y-1 py-1 border-l-2 border-[#E50914]">
-                {[
-                  { name: 'Divisi', icon: Building2 },
-                  { name: 'Jabatan', icon: Briefcase },
-                  { name: 'Karyawan', icon: Users },
-                  { name: 'User', icon: UserCog },
-                  { name: 'Konfigurasi', icon: Settings },
-                ].map((item) => (
-                  <div key={item.name} className="pl-6 py-2.5 flex items-center gap-3 text-gray-400 hover:text-[#E50914] cursor-pointer transition-colors group">
-                    <item.icon size={18} className="group-hover:scale-110 transition-transform" /> 
-                    <span className="font-medium text-sm uppercase tracking-tight">{item.name}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Activities */}
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                <h3 className="font-bold text-gray-800">Recent Activities</h3>
+              </div>
+              <div className="space-y-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-4 items-start">
+                    <div className="p-2 bg-gray-50 rounded-lg text-gray-400">
+                      <Settings size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-800 italic">Updated Divisi &quot;IT Support&quot;</p>
+                      <p className="text-xs text-gray-400 font-medium">2 hours ago</p>
+                    </div>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-
-          {/* Menu Lainnya */}
-          <div className="px-4 py-3 rounded-md hover:bg-white/5 cursor-pointer transition-all flex items-center gap-4 text-gray-400 hover:text-white group">
-            <CalendarCheck size={20} className="group-hover:text-[#E50914] transition-colors" />
-            <span className="font-bold text-base uppercase tracking-wider">Presensi</span>
-          </div>
-          <div className="px-4 py-3 rounded-md hover:bg-white/5 cursor-pointer transition-all flex items-center gap-4 text-gray-400 hover:text-white group">
-            <Palmtree size={20} className="group-hover:text-[#E50914] transition-colors" />
-            <span className="font-bold text-base uppercase tracking-wider">Cuti</span>
-          </div>
-          <div className="px-4 py-3 rounded-md hover:bg-white/5 cursor-pointer transition-all flex items-center gap-4 text-gray-400 hover:text-white group">
-            <Banknote size={20} className="group-hover:text-[#E50914] transition-colors" />
-            <span className="font-bold text-base uppercase tracking-wider">Gaji</span>
-          </div>
-        </nav>
-      </aside>
-
-      {/* MAIN CONTENT - MODERN DARK */}
-      <main className="flex-1 p-10 overflow-y-auto">
-        <header className="mb-10">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="h-8 w-1.5 bg-[#E50914]"></div>
-            <h2 className="text-4xl font-black uppercase tracking-tighter italic">
-              Welcome back, <span className="text-[#E50914]">{user?.name || "Admin"}</span>!
-            </h2>
-          </div>
-          <p className="text-gray-500 text-sm font-bold uppercase tracking-widest ml-5">
-            Dashboard System • Master Data Management
-          </p>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Card Info ala Netflix Card */}
-          <div className="relative overflow-hidden bg-[#181818] p-8 rounded-md border-b-4 border-[#E50914] shadow-xl group hover:-translate-y-2 transition-all duration-300">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition-transform">
-                <Users size={80} />
             </div>
-            <h3 className="text-gray-500 text-xs font-black uppercase tracking-[0.2em] mb-4">Total Customers</h3>
-            <p className="text-6xl font-black text-white italic group-hover:text-[#E50914] transition-colors">1</p>
-            <div className="mt-6 flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Updated Just Now
+
+            {/* Empty State / Next Reports */}
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 border-dashed flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                <TrendingUp className="text-blue-500" />
+              </div>
+              <h3 className="font-bold text-gray-800">New Reports Coming Soon</h3>
+              <p className="text-sm text-gray-400 mt-1 max-w-[200px]">We&apos;re building advanced analytics for your payroll.</p>
             </div>
           </div>
         </div>
