@@ -1,119 +1,89 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from "next/navigation";
+import React from 'react';
 import { 
-  LayoutDashboard, 
-  Database, 
-  ChevronDown, 
-  ChevronUp, 
-  CalendarCheck, 
-  Palmtree, 
-  Banknote,
-  Building2,
-  Briefcase,
-  Users,
-  UserCog,
-  Settings,
-  LogOut,
-  TrendingUp,
-  Clock,
-  CheckCircle2
+  FileText
 } from "lucide-react";
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [activeMenu, setActiveMenu] = useState("Dashboard"); // State untuk judul dinamis
-  const [isMasterOpen, setIsMasterOpen] = useState(true);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (!savedUser) {
-      router.push("/sign-in");
-    } else {
-      setUser(JSON.parse(savedUser));
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    router.push("/sign-in");
-  };
-
-  // Komponen Reusable untuk Card Info (Sesuai Foto)
-  const InfoCard = ({ title, value, icon: Icon, color, trend }: any) => (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col gap-4 relative overflow-hidden group hover:shadow-md transition-all">
+export default function DashboardPage({ user, activeMenu }: any) {
+  // REVISI: Ukuran dikecilkan (Compact Scale) agar mirip punya dosen
+  const InfoCard = ({ title, value, emoji, trend }: any) => (
+    <div className="bg-white p-5 rounded-[1.8rem] shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-all h-[155px] group cursor-default">
       <div className="flex justify-between items-start">
-        <div className={`p-3 rounded-2xl ${color} bg-opacity-10 text-gray-700`}>
-          <Icon size={24} />
+        {/* EMOJI: Dikecilkan dari 6xl ke 4xl agar tidak mendominasi kotak */}
+        <div className="text-4xl transition-all duration-300 filter grayscale group-hover:grayscale-0 select-none">
+          {emoji}
         </div>
+        
+        {/* BADGE TREND: Lebih mungil */}
         {trend && (
-          <span className={`text-xs font-bold px-2 py-1 rounded-full ${trend.includes('+') ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+          <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
+            trend === 'Stable' ? 'bg-blue-50 text-blue-400' : 
+            trend.includes('+') ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'
+          }`}>
             {trend}
           </span>
         )}
       </div>
-      <div>
-        <h3 className="text-gray-400 text-sm font-medium">{title}</h3>
-        <p className="text-3xl font-bold text-gray-800 mt-1">{value}</p>
+
+      <div className="mt-2">
+        {/* Font label lebih kecil dan tipis */}
+        <h3 className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider mb-0.5">{title}</h3>
+        {/* Angka diturunkan ke 2xl/3xl agar tidak terlalu 'berat' */}
+        <p className="text-2xl font-extrabold text-gray-800 tracking-tight">{value}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] text-gray-800 font-sans">
+    <>
+      {/* MAIN CONTENT HEADER: Ukuran teks dikurangi agar tidak makan tempat */}
+      <div className="mb-6">
+        <h1 className="text-4xl font-bold text-gray-800 tracking-tight">Welcome back, {user?.name || "Aris Munandar"}!</h1>
+        <p className="text-gray-400 mt-0.5 font-medium text-sm">Here's what's happening with your payroll system today.</p>
+      </div>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-y-auto">
+      {/* Grid 4 Kotak: Gap dikurangi dari 8 ke 5 untuk kesan compact */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+        <InfoCard title="Total Karyawan" value="124" emoji="👥" trend="+12%" />
+        <InfoCard title="Divisi" value="8" emoji="🏢" trend="Stable" />
+        <InfoCard title="Payroll Bulan Ini" value="Rp 450M" emoji="💰" trend="+5%" />
+        <InfoCard title="Pending Approval" value="12" emoji="⏳" trend="-2" />
+      </div>
 
-        <div className="p-10">
-          <div className="mb-10">
-            <h2 className="text-3xl font-bold text-gray-800">Welcome back, {user?.name || "Admin"}!</h2>
-            <p className="text-gray-400 mt-1 font-medium text-sm">Here&apos;s what&apos;s happening with your payroll system today.</p>
-          </div>
-
-          {/* Stats Grid (Identik Foto) */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-            <InfoCard title="Total Karyawan" value="124" icon={Users} color="bg-blue-500" trend="+12%" />
-            <InfoCard title="Divisi" value="8" icon={Building2} color="bg-purple-500" trend="Stable" />
-            <InfoCard title="Payroll Bulan Ini" value="Rp 450M" icon={Banknote} color="bg-green-500" trend="+5%" />
-            <InfoCard title="Pending Approval" value="12" icon={Clock} color="bg-orange-500" trend="-2" />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Recent Activities */}
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                <h3 className="font-bold text-gray-800">Recent Activities</h3>
-              </div>
-              <div className="space-y-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex gap-4 items-start">
-                    <div className="p-2 bg-gray-50 rounded-lg text-gray-400">
-                      <Settings size={18} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-800 italic">Updated Divisi &quot;IT Support&quot;</p>
-                      <p className="text-xs text-gray-400 font-medium">2 hours ago</p>
-                    </div>
+      {/* Section Bawah juga dikurangi paddingnya agar sinkron */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Recent Activities */}
+        <div className="md:col-span-2 bg-white p-7 rounded-[1.8rem] shadow-sm border border-gray-100">
+           <div className="flex items-center gap-2 mb-6">
+              <div className="w-2 h-2 bg-[#00c2cb] rounded-full shadow-[0_0_6px_rgba(0,194,203,0.5)]"></div>
+              <h3 className="font-bold text-lg text-gray-800 tracking-tight">Recent Activities</h3>
+           </div>
+           
+           <div className="space-y-6">
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="flex items-center gap-4 group cursor-pointer">
+                  <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-gray-100 transition-colors text-gray-300 group-hover:text-gray-500">
+                    <FileText size={20} />
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Empty State / Next Reports */}
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 border-dashed flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                <TrendingUp className="text-blue-500" />
-              </div>
-              <h3 className="font-bold text-gray-800">New Reports Coming Soon</h3>
-              <p className="text-sm text-gray-400 mt-1 max-w-[200px]">We&apos;re building advanced analytics for your payroll.</p>
-            </div>
-          </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-800 italic leading-none tracking-tight">Updated Divisi "IT Support"</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase mt-1.5 tracking-widest">{item * 2} hours ago</p>
+                  </div>
+                </div>
+              ))}
+           </div>
         </div>
-      </main>
-    </div>
+
+        {/* New Reports Section */}
+        <div className="bg-white p-7 rounded-[1.8rem] shadow-sm border border-gray-100 border-dashed flex flex-col items-center justify-center text-center">
+           <div className="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-4 opacity-70">
+              <span className="text-2xl animate-pulse">🚀</span>
+           </div>
+           <h3 className="font-bold text-base text-gray-800">New Reports Coming Soon</h3>
+           <p className="text-[11px] text-gray-400 mt-2 leading-relaxed max-w-[160px]">We're building advanced analytics for your payroll.</p>
+        </div>
+      </div>
+    </>
   );
 }

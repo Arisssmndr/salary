@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
+  import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fungsi Login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -26,7 +28,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Login gagal");
+        throw new Error(data.message || "Email atau password salah nih min.");
       }
 
       localStorage.setItem("access_token", data.token);
@@ -41,102 +43,167 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black w-full overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bca1-0746f37414a4/651c3041-d336-4039-8237-975c60216503/ID-en-20220502-popsignuptwoweeks-perspective_alpha_website_large.jpg" 
-          alt="background"
-          className="w-full h-full object-cover opacity-50"
-        />
-        <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-black via-transparent to-black"></div>
-      </div>
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Dekorasi Background agar senada dengan Dashboard */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/50 rounded-full blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-100/50 rounded-full blur-[120px]" />
 
-      {/* Header Logo */}
-      <nav className="relative z-10 px-8 py-6">
-        <h1 className="text-red-600 text-4xl font-bold tracking-tighter">NETFLIX</h1>
-      </nav>
+      <div className="w-full max-w-[1100px] grid lg:grid-cols-2 bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 overflow-hidden border border-white relative z-10">
+        {/* SISI KIRI: BRANDING & VISUAL */}
+        <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-[#004a7c] to-[#002a45] p-12 text-white">
+{/* LOGO SECTION - Pastikan dibungkus div dengan flex items-center */}
+<div className="flex items-center gap-4 mb-12"> 
+  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 flex-shrink-0">
+    <Image 
+      src="/crown-logo.jpg" 
+      alt="Logo"
+      width={30}
+      height={30}
+      className="object-contain"
+    />
+  </div>
+  <div className="flex flex-col">
+    <h2 className="text-xl font-black tracking-tighter leading-none text-white italic">
+      INDO<span className="text-blue-400">PAY</span>
+    </h2>
+    <p className="text-[9px] font-bold text-blue-200/50 tracking-[0.2em] mt-1 uppercase">
+      Payroll System
+    </p>
+  </div>
+</div>
 
-      {/* Login Card */}
-      <main className="relative z-10 flex justify-center items-center h-[80vh]">
-        <div className="bg-black/75 p-16 rounded-md w-full max-w-[450px]">
-          <h2 className="text-white text-3xl font-bold mb-8">Sign In</h2>
-          
-          {/* Tampilkan Error jika ada */}
+          <div>
+            <h2 className="text-4xl font-bold leading-tight mb-6">
+              Manage your <br />
+              <span className="text-blue-300">workforce</span> efficiently.
+            </h2>
+            <p className="text-blue-100/70 text-lg font-medium leading-relaxed">
+              Sistem Payroll & Management Karyawan terpadu untuk efektivitas
+              bisnis yang maksimal.
+            </p>
+          </div>
+
+          <div className="pt-8 border-t border-white/10">
+            <p className="text-sm font-medium text-blue-200/50">
+              © 2026 NUSAPAY Payroll System. All rights reserved.
+            </p>
+          </div>
+        </div>
+
+        {/* SISI KANAN: FORM LOGIN */}
+        <div className="p-12 lg:p-16 flex flex-col justify-center">
+          <div className="mb-10">
+            <h3 className="text-3xl font-black text-[#1a2b3c] tracking-tight">
+              Welcome Back!
+            </h3>
+            <p className="text-gray-400 mt-2 font-medium">
+              Silakan login untuk masuk ke dashboard Nusapay.
+            </p>
+          </div>
+
+          {/* Error Message */}
           {error && (
-            <div className="bg-[#e87c03] text-white text-[14px] p-3 rounded mb-4">
+            <div className="bg-red-50 border border-red-100 text-red-500 text-sm p-4 rounded-2xl mb-6 flex items-center gap-3 animate-shake">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-6">
             {/* Input Email */}
-            <div className="relative group">
-              <input
-                type="email"
-                id="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full px-5 pt-6 pb-2 text-white bg-[#333] rounded border-none appearance-none focus:outline-none focus:ring-0 peer" 
-                placeholder=" "
-              />
-              <label 
-                htmlFor="email" 
-                className="absolute text-gray-400 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
-              >
-                Email or phone number
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">
+                Email Address
               </label>
+              <div className="relative group">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all font-medium"
+                />
+                <Mail
+                  className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#004a7c] transition-colors"
+                  size={20}
+                />
+              </div>
             </div>
 
             {/* Input Password */}
-            <div className="relative group">
-              <input 
-                type="password" 
-                id="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full px-5 pt-6 pb-2 text-white bg-[#333] rounded border-none appearance-none focus:outline-none focus:ring-0 peer" 
-                placeholder=" " 
-              />
-              <label 
-                htmlFor="password" 
-                className="absolute text-gray-400 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
-              >
-                Password
-              </label>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                  Password
+                </label>
+                <a
+                  href="#"
+                  className="text-[11px] font-bold text-[#004a7c] hover:underline uppercase tracking-widest"
+                >
+                  Forgot?
+                </a>
+              </div>
+              <div className="relative group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all font-medium"
+                />
+                <Lock
+                  className="absolute left-4 top-4 text-gray-400 group-focus-within:text-[#004a7c] transition-colors"
+                  size={20}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
 
-            <button 
+            {/* Button Login */}
+            <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 mt-4 bg-red-600 text-white font-bold rounded hover:bg-red-700 transition disabled:bg-red-800 disabled:cursor-not-allowed"
+              className="w-full bg-[#004a7c] hover:bg-[#003559] text-white font-bold py-4 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2 group disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing In..." : "Sign In"}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                <>
+                  Sign In to Account
+                  <ArrowRight
+                    size={18}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </>
+              )}
             </button>
-
-            <div className="flex justify-between items-center text-gray-400 text-sm mt-2">
-              <div className="flex items-center gap-1">
-                <input type="checkbox" className="w-4 h-4 bg-gray-500 border-none" />
-                <span>Remember me</span>
-              </div>
-              <a href="#" className="hover:underline">Need help?</a>
-            </div>
           </form>
 
-          <div className="mt-16">
-            <p className="text-gray-500">
-              New to Netflix? <span className="text-white hover:underline cursor-pointer" 
-              onClick={() => router.push("/sign-up")}>Sign up now.</span>
-            </p>
-            <p className="text-gray-400 text-xs mt-4">
-              This page is protected by Google reCAPTCHA...
-              <span className="text-blue-600 hover:underline"> Learn more.</span>
+          <div className="mt-10 text-center">
+            <p className="text-gray-400 font-medium text-sm">
+              Belum punya akun?{" "}
+              <span
+                className="text-[#004a7c] font-bold hover:underline cursor-pointer"
+                onClick={() => router.push("/sign-up")}
+              >
+                Hubungi Admin Utama.
+              </span>{" "}
+              {/* <-- Pastikan ada tutup span ini min! */}
             </p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
