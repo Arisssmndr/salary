@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
-  import Image from 'next/image';
+import { Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck,   ArrowLeft, } from "lucide-react";
+import Image from "next/image";
+// 
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,26 +52,26 @@ export default function LoginPage() {
       <div className="w-full max-w-[1100px] grid lg:grid-cols-2 bg-white rounded-[2.5rem] shadow-2xl shadow-blue-900/5 overflow-hidden border border-white relative z-10">
         {/* SISI KIRI: BRANDING & VISUAL */}
         <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-[#004a7c] to-[#002a45] p-12 text-white">
-{/* LOGO SECTION - Pastikan dibungkus div dengan flex items-center */}
-<div className="flex items-center gap-4 mb-12"> 
-  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 flex-shrink-0">
-    <Image 
-      src="/crown-logo.jpg" 
-      alt="Logo"
-      width={30}
-      height={30}
-      className="object-contain"
-    />
-  </div>
-  <div className="flex flex-col">
-    <h2 className="text-xl font-black tracking-tighter leading-none text-white italic">
-      INDO<span className="text-blue-400">PAY</span>
-    </h2>
-    <p className="text-[9px] font-bold text-blue-200/50 tracking-[0.2em] mt-1 uppercase">
-      Payroll System
-    </p>
-  </div>
-</div>
+          {/* LOGO SECTION - Pastikan dibungkus div dengan flex items-center */}
+          <div className="flex items-center gap-4 mb-12">
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 flex-shrink-0">
+              <Image
+                src="/crown-logo.jpg"
+                alt="Logo"
+                width={30}
+                height={30}
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <h2 className="text-xl font-black tracking-tighter leading-none text-white italic">
+                INDO<span className="text-blue-400">PAY</span>
+              </h2>
+              <p className="text-[9px] font-bold text-blue-200/50 tracking-[0.2em] mt-1 uppercase">
+                Payroll System
+              </p>
+            </div>
+          </div>
 
           <div>
             <h2 className="text-4xl font-bold leading-tight mb-6">
@@ -92,6 +93,18 @@ export default function LoginPage() {
 
         {/* SISI KANAN: FORM LOGIN */}
         <div className="p-12 lg:p-16 flex flex-col justify-center">
+
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 text-gray-400 hover:text-[#004a7c] font-bold text-xs uppercase tracking-widest mb-3 transition-colors group"
+          >
+            <ArrowLeft
+              size={16}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+            Back
+          </button> 
+
           <div className="mb-10">
             <h3 className="text-3xl font-black text-[#1a2b3c] tracking-tight">
               Welcome Back!

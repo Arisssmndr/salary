@@ -109,14 +109,14 @@ export default function SignUpPage() {
         <div className="p-12 lg:p-16 flex flex-col justify-center">
           <button
             onClick={() => router.push("/sign-in")}
-            className="flex items-center gap-2 text-gray-400 hover:text-[#004a7c] font-bold text-xs uppercase tracking-widest mb-8 transition-colors group"
+            className="flex items-center gap-2 text-gray-400 hover:text-[#004a7c] font-bold text-xs uppercase tracking-widest mb-3 transition-colors group"
           >
             <ArrowLeft
               size={16}
               className="group-hover:-translate-x-1 transition-transform"
             />
             Back to Login
-          </button>
+          </button> 
 
           <div className="mb-10">
             <h3 className="text-3xl font-black text-[#1a2b3c] tracking-tight">
