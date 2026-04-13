@@ -29,7 +29,7 @@ export default function RiwayatCutiPage() {
     <div className="p-0 max-w-[1200px]">
       {/* HEADER SECTION */}
       <div className="mb-10">
-        <h1 className="text-3xl font-black text-[#1a2b3c] tracking-tighter uppercase italic flex items-center gap-3">
+        <h1 className="text-3xl font-black text-[#1a2b3c] tracking-tighter  flex items-center gap-3">
           RIWAYAT & SALDO CUTI
         </h1>
         <p className="text-gray-400 mt-1 font-medium text-sm">
@@ -66,8 +66,7 @@ export default function RiwayatCutiPage() {
       <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 bg-[#00c2cb] rounded-full shadow-[0_0_10px_rgba(0,194,203,0.6)]"></div>
-            <h3 className="font-black text-xl text-[#1a2b3c] tracking-tighter uppercase italic">Riwayat Pengajuan</h3>
+            <h3 className="font-black text-xl tracking-tighter">Riwayat Pengajuan</h3>
           </div>
           
           <div className="flex bg-gray-50 p-1.5 rounded-2xl shadow-inner">

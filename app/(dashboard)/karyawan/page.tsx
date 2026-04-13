@@ -1,41 +1,68 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, Pencil, Trash2, ChevronDown, Info, X, Mail, MapPin, Calendar, Briefcase, User
 } from "lucide-react";
 
 export default function KaryawanPage() {
-  // 1. Data Mock (Dropdown & Initial List)
-  const [jabatanOptions] = useState(["MANAGER IT", "FRONTEND DEVELOPER", "HR SPECIALIST", "FINANCE"]);
-  const [karyawanList, setKaryawanList] = useState([
-    { 
-      id: 1, nik: "EMP001", nama: "Ahmad Fauzi", email: "ahmad.fauzi@company.com", 
-      tempatLahir: "Bandung", tanggalLahir: "1990-05-15", alamat: "Jl. Merdeka No. 123", 
-      jabatan: "MANAGER IT", status: "AKTIF" 
-    },
-    { 
-      id: 2, nik: "EMP002", nama: "Siti Aminah", email: "siti.aminah@company.com", 
-      tempatLahir: "Jakarta", tanggalLahir: "1995-08-20", alamat: "Jl. Sudirman No. 45", 
-      jabatan: "HR SPECIALIST", status: "AKTIF" 
-    }
-  ]);
+  // 1. State Data dari API
+  const [jabatanOptions, setJabatanOptions] = useState<any[]>([]);
+  const [karyawanList, setKaryawanList] = useState<any[]>([]);
+  const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // 2. State Form
+  // 2. State Form (Tetap Sama)
   const [formData, setFormData] = useState({
     nik: "", nama: "", email: "", tempatLahir: "", tanggalLahir: "", alamat: "", jabatan: "", status: "AKTIF"
   });
   const [editId, setEditId] = useState<number | null>(null);
   
-  // 3. State Modal Detail
+  // 3. State Modal Detail (Tetap Sama)
   const [showDetail, setShowDetail] = useState<any>(null);
+
+  // --- LOGIKA FETCHING ---
+  useEffect(() => {
+    const storedToken = localStorage.getItem("access_token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      fetchJabatan();
+      fetchKaryawan();
+    }
+  }, [token]);
+
+  const fetchJabatan = async () => {
+    try {
+      const res = await fetch("https://payroll.politekniklp3i-tasikmalaya.ac.id/api/jabatan", {
+        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
+      });
+      const data = await res.json();
+      setJabatanOptions(data.data || data);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchKaryawan = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("https://payroll.politekniklp3i-tasikmalaya.ac.id/api/karyawan", {
+        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
+      });
+      const data = await res.json();
+      setKaryawanList(data.data || data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  };
+  // -----------------------
 
   const handleSave = () => {
     if (!formData.nik || !formData.nama || !formData.jabatan) {
       alert("Minimal isi NIK, Nama, dan Jabatan ya!");
       return;
     }
-
+    // Logika save sementara tetap local atau bisa ditambah fetch POST nanti
     if (editId) {
       setKaryawanList(karyawanList.map(item => item.id === editId ? { ...formData, id: editId } : item));
     } else {
@@ -70,7 +97,7 @@ export default function KaryawanPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* KOTAK KIRI: INPUT FORM (PROFIL LENGKAP) */}
+        {/* KOTAK KIRI: INPUT FORM */}
         <div className="lg:col-span-4 bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 max-h-[85vh] overflow-y-auto custom-scrollbar">
           <div className="flex items-center gap-3 mb-8">
             <div className={`p-2 rounded-lg ${editId ? 'bg-orange-50 text-orange-500' : 'bg-blue-50 text-blue-500'}`}>
@@ -116,7 +143,7 @@ export default function KaryawanPage() {
               <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Jabatan</label>
               <select value={formData.jabatan} onChange={(e) => setFormData({...formData, jabatan: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm appearance-none cursor-pointer">
                 <option value="">Pilih Jabatan</option>
-                {jabatanOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                {jabatanOptions.map(opt => <option key={opt.id} value={opt.jabatan}>{opt.jabatan}</option>)}
               </select>
               <ChevronDown className="absolute right-4 top-[38px] text-gray-400" size={16} />
             </div>
@@ -130,7 +157,7 @@ export default function KaryawanPage() {
           </div>
         </div>
 
-        {/* KOTAK KANAN: TABEL DATA (VIEW KERJAAN) */}
+        {/* KOTAK KANAN: TABEL DATA */}
         <div className="lg:col-span-8 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8 border-b border-gray-50 flex justify-between items-center">
             <h3 className="font-bold text-xl text-gray-800 tracking-tight">Data Karyawan</h3>
@@ -149,33 +176,39 @@ export default function KaryawanPage() {
                 </tr>
               </thead>
               <tbody>
-                {karyawanList.map((item, index) => (
-                  <tr key={item.id} className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
-                    <td className="px-8 py-6 text-sm font-bold text-blue-400/60">{index + 1}</td>
-                    <td className="px-8 py-6">
-                      <p className="text-[14px] font-bold text-gray-700">{item.nama}</p>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="text-[11px] font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-lg uppercase tracking-tight">{item.jabatan}</span>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="bg-emerald-50 text-emerald-500 text-[10px] font-black px-2.5 py-1 rounded-md">AKTIF</span>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                        <button onClick={() => setShowDetail(item)} className="p-2 bg-blue-50 text-blue-500 rounded-lg hover:bg-blue-100 transition-colors">
-                          <Info size={16} />
-                        </button>
-                        <button onClick={() => handleEdit(item)} className="p-2 bg-orange-50 text-orange-400 rounded-lg hover:bg-orange-100 transition-colors">
-                          <Pencil size={16} />
-                        </button>
-                        <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-100 transition-colors">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <tr><td colSpan={5} className="text-center py-10 text-gray-400 text-sm">Loading data...</td></tr>
+                ) : (
+                  karyawanList.map((item, index) => (
+                    <tr key={item.id} className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
+                      <td className="px-8 py-6 text-sm font-bold text-blue-400/60">{index + 1}</td>
+                      <td className="px-8 py-6">
+                        <p className="text-[14px] font-bold text-gray-700">{item.nama}</p>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="text-[11px] font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-lg uppercase tracking-tight">
+                          {typeof item.jabatan === 'object' ? item.jabatan?.jabatan : item.jabatan}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="bg-emerald-50 text-emerald-500 text-[10px] font-black px-2.5 py-1 rounded-md">AKTIF</span>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                          <button onClick={() => setShowDetail(item)} className="p-2 bg-blue-50 text-blue-500 rounded-lg hover:bg-blue-100 transition-colors">
+                            <Info size={16} />
+                          </button>
+                          <button onClick={() => handleEdit(item)} className="p-2 bg-orange-50 text-orange-400 rounded-lg hover:bg-orange-100 transition-colors">
+                            <Pencil size={16} />
+                          </button>
+                          <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-50 text-red-400 rounded-lg hover:bg-red-100 transition-colors">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -183,7 +216,7 @@ export default function KaryawanPage() {
 
       </div>
 
-      {/* MODAL DETAIL KARYAWAN (POP-UP) */}
+      {/* MODAL DETAIL KARYAWAN */}
       {showDetail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a2b3c]/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden relative animate-in zoom-in-95 duration-300">
@@ -193,7 +226,9 @@ export default function KaryawanPage() {
                 <X size={20} />
               </button>
               <h2 className="text-2xl font-bold mb-1">{showDetail.nama}</h2>
-              <p className="text-blue-200 text-sm font-medium tracking-wide uppercase">{showDetail.jabatan}</p>
+              <p className="text-blue-200 text-sm font-medium tracking-wide uppercase">
+                {typeof showDetail.jabatan === 'object' ? showDetail.jabatan?.jabatan : showDetail.jabatan}
+              </p>
             </div>
 
             {/* Body Modal */}
@@ -226,7 +261,7 @@ export default function KaryawanPage() {
                   </div>
                   <div>
                     <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Birth Information</label>
-                    <p className="text-sm font-semibold text-gray-600">{showDetail.tempatLahir}, {showDetail.tanggalLahir}</p>
+                    <p className="text-sm font-semibold text-gray-600">{showDetail.tempat_lahir || showDetail.tempatLahir}, {showDetail.tgl_lahir || showDetail.tanggalLahir}</p>
                   </div>
                 </div>
 
@@ -241,7 +276,6 @@ export default function KaryawanPage() {
                 </div>
               </div>
 
-              {/* Footer Modal */}
               <button 
                 onClick={() => setShowDetail(null)}
                 className="w-full bg-gray-50 hover:bg-gray-100 text-gray-500 font-bold py-4 rounded-2xl transition-all border border-gray-100 mt-4"

@@ -1,74 +1,121 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // 1. Tambahkan useEffect
 import { 
   Plus, 
   Pencil, 
   Trash2, 
-  LayoutGrid
 } from "lucide-react";
 
 export default function DivisiPage() {
-  // State untuk data divisi (Dummy data awal)
-  const [divisiList, setDivisiList] = useState([
-    { id: 1, name: "INFORMATION TECHNOLOGY" },
-    { id: 2, name: "HRD" }
-  ]);
-
-  // State untuk form
-  const [inputName, setInputName] = useState("");
+  // --- STATE ---
+  const [divisiList, setDivisiList] = useState<any[]>([]); // Ubah jadi array kosong
+  const [inputDivisi, setInputDivisi] = useState("");
   const [editId, setEditId] = useState<number | null>(null);
+  const [token, setToken] = useState("");
 
-  // Fungsi Simpan / Update
-  const handleSave = () => {
-    if (!inputName.trim()) return;
+  // 2. AMBIL TOKEN (Sesuaikan penyimpanan token kamu)
+  useEffect(() => {
+    const storedToken = localStorage.getItem("access_token");
+    if (storedToken) setToken(storedToken);
+    console.log(storedToken);
+    
+  }, []);
 
-    if (editId) {
-      // Logic Update
-      setDivisiList(divisiList.map(item => 
-        item.id === editId ? { ...item, name: inputName.toUpperCase() } : item
-      ));
-      setEditId(null);
-    } else {
-      // Logic Tambah Baru
-      const newData = {
-        id: Date.now(),
-        name: inputName.toUpperCase()
-      };
-      setDivisiList([...divisiList, newData]);
+  // 3. GET DATA (FETCH)
+  const fetchDivisi = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("https://payroll.politekniklp3i-tasikmalaya.ac.id/api/divisi", 
+        {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDivisiList(data.data || data); // Sesuaikan dengan struktur API
+      }
+    } catch (err) {
+      console.error("Gagal mengambil data:", err);
     }
-    setInputName("");
   };
 
-  // Fungsi Edit (Naikkan data ke form)
+  useEffect(() => {
+    fetchDivisi();
+  }, [token]);
+
+  // 4. FUNGSI SIMPAN / UPDATE (API)
+  const handleSave = async () => {
+    if (!inputDivisi.trim()) return;
+
+    const url = editId 
+      ? `https://payroll.politekniklp3i-tasikmalaya.ac.id/api/divisi/${editId}` // URL Update
+      : "https://payroll.politekniklp3i-tasikmalaya.ac.id/api/divisi"; // URL Create
+
+    try {
+      const res = await fetch(url, {
+        method: editId ? "PATCH" : "POST", // Method dinamis
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          divisi: inputDivisi.toUpperCase(), // Pastikan key 'nama' sesuai database
+        }),
+      });
+
+      if (res.ok) {
+        fetchDivisi(); // Refresh tabel
+        setInputDivisi("");
+        setEditId(null);
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "Terjadi kesalahan");
+      }
+    } catch (err) {
+      console.error("Gagal menyimpan:", err);
+    }
+  };
+
+  // 5. FUNGSI HAPUS (API)
+  const handleDelete = async (id: number) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus divisi ini?")) return;
+
+    try {
+      const res = await fetch(`https://payroll.politekniklp3i-tasikmalaya.ac.id/api/divisi/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+        },
+      });
+
+      if (res.ok) {
+        fetchDivisi(); // Refresh tabel
+      }
+    } catch (err) {
+      console.error("Gagal menghapus:", err);
+    }
+  };
+
   const handleEdit = (item: any) => {
     setEditId(item.id);
-    setInputName(item.name);
-  };
-
-  // Fungsi Hapus dengan Alert Browser
-  const handleDelete = (id: number) => {
-    const confirmDelete = confirm("Apakah Anda yakin ingin menghapus divisi ini?");
-    if (confirmDelete) {
-      setDivisiList(divisiList.filter(item => item.id !== id));
-      if (editId === id) {
-        setEditId(null);
-        setInputName("");
-      }
-    }
+    // Sesuaikan item.name dengan item.nama (biasanya API menggunakan nama Indonesia)
+    setInputDivisi(item.divisi || item.divisi); 
   };
 
   return (
     <>
-      {/* HEADER - Samakan skala dengan Dashboard */}
+      {/* TAMPILAN TETAP SAMA SEPERTI KODE LAMA KAMU */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-[#1a2b3c] tracking-tight">Management Divisi</h1>
         <p className="text-gray-400 mt-1 font-medium text-sm">Configure and manage company departments.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* KOTAK KECIL: FORM INPUT (4 Kolom) */}
         <div className="lg:col-span-4 bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 transition-all">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 bg-blue-50 rounded-lg text-blue-500">
@@ -83,8 +130,8 @@ export default function DivisiPage() {
               <input 
                 type="text"
                 placeholder="Contoh: IT Support"
-                value={inputName}
-                onChange={(e) => setInputName(e.target.value)}
+                value={inputDivisi}
+                onChange={(e) => setInputDivisi(e.target.value)}
                 className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all text-gray-700 font-medium"
               />
             </div>
@@ -99,7 +146,7 @@ export default function DivisiPage() {
               
               {editId && (
                 <button 
-                  onClick={() => { setEditId(null); setInputName(""); }}
+                  onClick={() => { setEditId(null); setInputDivisi(""); }}
                   className="px-6 bg-gray-100 hover:bg-gray-200 text-gray-500 font-bold py-3.5 rounded-2xl transition-all active:scale-95"
                 >
                   Batal
@@ -109,7 +156,6 @@ export default function DivisiPage() {
           </div>
         </div>
 
-        {/* KOTAK GEDE: DATA DIVISI (8 Kolom) */}
         <div className="lg:col-span-8 bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-8 border-b border-gray-50 flex justify-between items-center">
             <h3 className="font-bold text-xl text-gray-800 tracking-tight">Data Divisi</h3>
@@ -129,28 +175,23 @@ export default function DivisiPage() {
               </thead>
               <tbody>
                 {divisiList.map((item, index) => (
-                  <tr 
-                    key={item.id} 
-                    className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0"
-                  >
+                  <tr key={item.id} className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
                     <td className="px-8 py-6 text-sm font-bold text-blue-400/70">{index + 1}</td>
                     <td className="px-8 py-6 text-[15px] font-bold text-gray-700 tracking-tight uppercase">
-                      {item.name}
+                      {/* Sesuaikan item.nama dengan kolom dari API */}
+                      {item.divisi || item.divisi} 
                     </td>
                     <td className="px-8 py-6 text-right">
-                      {/* ACTION BUTTONS: Muncul saat hover (group-hover) */}
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
                         <button 
                           onClick={() => handleEdit(item)}
                           className="p-2.5 bg-white border border-gray-100 rounded-xl text-orange-400 hover:bg-orange-50 hover:border-orange-100 transition-all shadow-sm"
-                          title="Edit"
                         >
                           <Pencil size={18} />
                         </button>
                         <button 
                           onClick={() => handleDelete(item.id)}
                           className="p-2.5 bg-white border border-gray-100 rounded-xl text-red-400 hover:bg-red-50 hover:border-red-100 transition-all shadow-sm"
-                          title="Hapus"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -162,7 +203,6 @@ export default function DivisiPage() {
             </table>
           </div>
         </div>
-
       </div>
     </>
   );

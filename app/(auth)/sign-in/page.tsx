@@ -20,48 +20,38 @@
     setLoading(true);
 
     try {
-      // 1. CEK DULU APAKAH INI ADMIN (HRD) - STATIS
-      if (email === "hrd@gmail.com" && password === "hrd123") {
-        const adminData = { 
-          name: "Administrator HRD", 
-          email: "hrd@mail.com",
-          role: "admin" 
-        };
-        
-        // Simpan tanda kalau dia admin
-        localStorage.setItem("userRole", "admin");
-        localStorage.setItem("user", JSON.stringify(adminData));
-        
-        alert("Login Berhasil sebagai Admin!");
-        router.push("/dashboard"); // Rute khusus Admin
-        return; 
-      }
+  // Lakukan fetch login ke API untuk SEMUA user (termasuk admin)
+  const res = await fetch("https://payroll.politekniklp3i-tasikmalaya.ac.id/login", { 
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
-      // 2. JIKA BUKAN ADMIN, MAKA ANGGAP SEBAGAI USER (LEWAT API DOSEN)
-      // Ganti URL dengan endpoint asli dari dosen kamu
-      const res = await fetch("https://payroll.politekniklp3i-tasikmalaya.ac.id/login", { 
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  const data = await res.json();
 
-      const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || "Email atau password salah.");
+  }
 
-      if (!res.ok) {
-        throw new Error(data.message || "Email atau password salah nih min.");
-      }
+  // SIMPAN TOKEN ASLI DARI API (Penting!)
+  localStorage.setItem("access_token", data.token);
 
-      // Simpan data User dari API
-      localStorage.setItem("access_token", data.token);
-      localStorage.setItem("userRole", "user");
-      localStorage.setItem("user", JSON.stringify(data.user));
+  // CEK ROLE BERDASARKAN EMAIL (Atau dari data.user.role jika API menyediakannya)
+  if (email === "hrd@mail.com") {
+    localStorage.setItem("userRole", "admin");
+    localStorage.setItem("user", JSON.stringify(data.user));
+    alert("Login Berhasil sebagai Admin!");
+    router.push("/dashboard");
+  } else {
+    localStorage.setItem("userRole", "user");
+    localStorage.setItem("user", JSON.stringify(data.user));
+    alert("Login Berhasil sebagai Karyawan!");
+    router.push("/home");
+  }
 
-      alert("Login Berhasil sebagai Karyawan!");
-      router.push("/home"); // Rute khusus User (agar tidak bentrok)
-
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+} catch (err: any) {
+  setError(err.message);
+} finally {
       setLoading(false);
     }
   };
