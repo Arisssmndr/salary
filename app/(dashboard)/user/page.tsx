@@ -195,16 +195,16 @@ export default function UserPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-  <thead>
-    <tr className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold border-b border-gray-50">
-      <th className="px-8 py-5">Info Personal</th>
-      <th className="px-8 py-5">Role Akses</th>
-      <th className="px-8 py-5">Status</th>
-      {/* 1. Tambahkan Header untuk Last Login agar sejajar */}
-      <th className="px-8 py-5">Last Login</th>
-      <th className="px-8 py-5 text-right">Aksi</th>
-    </tr>
-  </thead>
+          <thead>
+            <tr className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold border-b border-gray-50">
+              <th className="px-8 py-5">Info Personal</th>
+              <th className="px-8 py-5">Role Akses</th>
+              <th className="px-8 py-5">Status</th>
+              {/* 1. Tambahkan Header untuk Last Login agar sejajar */}
+              <th className="px-8 py-5">Last Login</th>
+              <th className="px-8 py-5 text-right">Aksi</th>
+            </tr>
+          </thead>
   <tbody>
     {loading ? (
       <tr>

@@ -37,17 +37,33 @@
   localStorage.setItem("access_token", data.token);
 
   // CEK ROLE BERDASARKAN EMAIL (Atau dari data.user.role jika API menyediakannya)
-  if (email === "hrd@mail.com") {
-    localStorage.setItem("userRole", "admin");
-    localStorage.setItem("user", JSON.stringify(data.user));
-    alert("Login Berhasil sebagai Admin!");
-    router.push("/dashboard");
-  } else {
-    localStorage.setItem("userRole", "user");
-    localStorage.setItem("user", JSON.stringify(data.user));
-    alert("Login Berhasil sebagai Karyawan!");
-    router.push("/home");
-  }
+  // if (email === "hrd@mail.com") {
+  //   localStorage.setItem("userRole", "admin");
+  //   localStorage.setItem("user", JSON.stringify(data.user));
+  //   alert("Login Berhasil sebagai Admin!");
+  //   router.push("/dashboard");
+  // } else {
+  //   localStorage.setItem("userRole", "user");
+  //   localStorage.setItem("user", JSON.stringify(data.user));
+  //   alert("Login Berhasil sebagai Karyawan!");
+  //   router.push("/home");
+  // }
+
+  // 1. Ekstrak data (handle nested 'data' dari API)
+  const token = data.token || data.data?.token;
+  const userData = data.user || data.data?.user;
+  const userRole = userData?.role || (email === "hrd@mail.com" ? "admin" : "user");
+
+  // 2. Simpan ke LocalStorage
+  if (token) localStorage.setItem("access_token", token);
+  localStorage.setItem("user", JSON.stringify(userData));
+  localStorage.setItem("userRole", userRole);
+
+  // 3. Routing satu baris
+  alert(`Login Berhasil sebagai ${userRole === "admin" ? "Admin" : "Karyawan"}!`);
+  router.push(userRole === "admin" ? "/dashboard" : "/home");
+
+  
 
 } catch (err: any) {
   setError(err.message);

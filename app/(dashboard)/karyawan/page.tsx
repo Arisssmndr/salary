@@ -187,6 +187,7 @@ export default function KaryawanPage() {
                       </td>
                       <td className="px-8 py-6">
                         <span className="text-[11px] font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-lg uppercase tracking-tight">
+                          {/* {item.id_jabatan} */}
                           {typeof item.jabatan === 'object' ? item.jabatan?.jabatan : item.jabatan}
                         </span>
                       </td>
